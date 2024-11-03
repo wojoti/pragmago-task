@@ -39,9 +39,17 @@ export const useMainPage = () => {
   } | null>(null);
   const [selectedParents, setSelectedParents] = useState<Frog[]>([]);
   const isValidJump = (frog: Frog, toX: number, toY: number) => {
-    const distance = Math.max(Math.abs(frog.x - toX), Math.abs(frog.y - toY));
+    const dx = Math.abs(frog.x - toX);
+    const dy = Math.abs(frog.y - toY);
+    const isValidDirection =
+      dx === dy || // diagonal
+      (dx === 0 && dy > 0) || // hertical
+      (dy === 0 && dx > 0); // horizontal
+
+    const distance = Math.max(dx, dy);
     const maxDistance = frog.gender === "male" ? 3 : 2;
-    return distance <= maxDistance && distance > 0;
+
+    return isValidDirection && distance <= maxDistance;
   };
   const getAdjacentCells = (x: number, y: number) => {
     const adjacent = [];
@@ -77,6 +85,9 @@ export const useMainPage = () => {
       setSelectedFrog(frogAtCell);
       setSelectedCell(null);
     } else {
+      if (selectedParents.length === 2) {
+        setSelectedParents([selectedParents[1]]);
+      }
       setSelectedCell({ x, y });
     }
   };
